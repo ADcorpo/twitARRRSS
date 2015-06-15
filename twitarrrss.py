@@ -20,8 +20,8 @@ def format_tweet(tweet):
     if 'media' in tweet['entities']:
         tweet['text'] += "<img src='{}'>".format(tweet['entities']['media'][0]['media_url'])
 
-    tweet['text'] += "<a href='{}'>link to the tweet…</a>"
-    tweet['text'] = tweet['text'].format("https://twitter.com/" + tweet['user']['name'] + "/status/" + tweet['id_str'])
+    tweet_link = "https://twitter.com/" + tweet['user']['name'] + "/status/" + tweet['id_str']
+    tweet['text'] += "\n<a href='" + tweet_link + "'>link to the tweet…</a>"
 
     return tweet
     
@@ -40,6 +40,27 @@ def get_user_timeline(username):
     for tweet in timeline:
         tweet = format_tweet(tweet)
         
+        feed.add(tweet['title'],
+                 tweet['text'],
+                 content_type='html',
+                 author=tweet['user']['name'],
+                 updated=tweet['created_at'],
+                 id=tweet['id'])
+
+    return feed.get_response()
+
+@app.route('/search/<query>')
+@app.route('/search/<query>/<result_type>')
+def search(query, result_type='mixed'):
+    feed = AtomFeed("Search: " + query,
+                    feed_url = request.url,
+                    url = request.url_root)
+
+    search = api.search.tweets(q=query, result_type=result_type)['statuses']
+
+    for tweet in search:
+        tweet = format_tweet(tweet)
+
         feed.add(tweet['title'],
                  tweet['text'],
                  content_type='html',
