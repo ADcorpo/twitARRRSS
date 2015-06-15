@@ -13,6 +13,26 @@ api = Twitter(auth=OAuth(credentials['token'],
 
 app = Flask(__name__)
 
+def format_tweet(tweet):
+    created_at = datetime.strptime(tweet['created_at'].replace('+0000','UTC'), '%a %b %d %H:%M:%S %Z %Y')
+    title = "@" + username + ': ' + tweet['text']
+
+    if 'media' in tweet['entities']:
+        content += "<img src='{}'>".format(tweet['entities']['media'][0]['media_url'])
+
+    content += "<a href='{}'>link to the tweet…</a>"
+    content.format("https://twitter.com/" + username + "/status/" + tweet['id_str'])
+
+    tweet_data = \
+                 {
+                     'created_at': created_at,
+                     'title': title,
+                     'content': content
+                 }
+
+    return tweet_data
+    
+
 @app.route('/timeline/<username>')
 def get_user_timeline(username):
     feed = AtomFeed(username + "'s timeline",
@@ -25,22 +45,13 @@ def get_user_timeline(username):
                                           exclude_replies=True)
 
     for tweet in timeline:
-        published = datetime.strptime(tweet['created_at'].replace('+0000','UTC'), '%a %b %d %H:%M:%S %Z %Y')
-        title = "@" + username + ': ' + tweet['text']
-
-        content = tweet['text'] + '\n'
-
-        if 'media' in tweet['entities']:
-            content += "<img src='{}'>".format(tweet['entities']['media'][0]['media_url'])
-
-        content += "<a href='{}'>link to the tweet…</a>".format("https://twitter.com/" + username + "/status/" + tweet['id_str'])
+        tweet_data = format_tweet(tweet)
         
-        feed.add(title,
-                 content,
+        feed.add(tweet_data['title'],
+                 tweet_data['content'],
                  content_type='html',
                  author=username,
-                 published=published,
-                 updated=published,
+                 updated=tweet_data['created_at'],
                  id=tweet['id'])
 
     return feed.get_response()
