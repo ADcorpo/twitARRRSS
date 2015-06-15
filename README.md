@@ -10,9 +10,10 @@ twitter usage.
 
 ## TODO
 
-* add a twitter search endpoint
+* add a twitter search endpoint [DONE] [PERFECTIBLE]
 * find ideas to ease the use of twitARRRSS as a monitoring/community management tool
+* clean up the code, make it more generic (if possible)
 
-## Side notes
+## Side notes, suggestions
 
 This is my first try with flask, if I made mistakes, please tell me o/
