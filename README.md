@@ -1,5 +1,5 @@
 # twitARRRSS
-Twitter for RSS fanboys
+Twitter for RSS fanboys/girls/DOGEs
 
 twitARRRSS is a small script that converts twitter API endpoints to Atom feeds.
 
